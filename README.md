@@ -1,22 +1,30 @@
-# Multiple Machine Learing Algorithms Analysis for Breast Cancer Classification (WIP)
+# Machine Learing Algorithms Analysis for Breast Cancer Classification
 
 ## Introduction
-BLAH BLAH
+A performance anlyisis on three, common, supervised machine learning algorithms. All three algorithms were given the exact same data. The data can be found here: https://www.kaggle.com/merishnasuwal/breast-cancer-prediction-dataset
+
+The data features are the dimentions of a found lump by patients, and a label whether it was cancerous or not. All programming is done with Python, scikit-learn, matplot, pandas, and numpy.
 
 
 
 
 ## Data Collection and Cleaning
-blah blah
+
 
 
 ```python
 #imports
 import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
 from sklearn.model_selection import train_test_split 
 from sklearn.linear_model import LogisticRegression
 from sklearn import svm
 from sklearn.naive_bayes import GaussianNB
+
+from sklearn.metrics import confusion_matrix
+
 
 
 #import the data.
@@ -24,7 +32,6 @@ data = pd.read_csv('data.csv')
 
 #Show first 5 entries.
 data.head()
-
 ```
 
 
@@ -147,6 +154,8 @@ print 'x_values matrix dimensions (NxM): ', x_values.shape
 print('')
 print 'y_values matrix dimensions (Nx1): ', y_values.shape
 
+data.iloc[:, :-1].plot(kind='density', subplots=True, layout=(3,3), figsize=(20,20), sharex=False)
+plt.show()
 ```
 
     x_values matrix dimensions (NxM):  (569, 5)
@@ -154,7 +163,9 @@ print 'y_values matrix dimensions (Nx1): ', y_values.shape
     y_values matrix dimensions (Nx1):  (569,)
 
 
-### Do Visual Stuff
+
+![png](output_10_1.png)
+
 
 ### Seperate into training and testing fields
 
@@ -164,12 +175,7 @@ print 'y_values matrix dimensions (Nx1): ', y_values.shape
 
 x_train, x_test, y_train, y_test = train_test_split(x_values, y_values, test_size = 0.25, random_state = 0)
 
-##add more here
-
-
 ```
-
-## Algorithms Used in Analysis
 
 ## Aanalysis
 
@@ -178,27 +184,40 @@ x_train, x_test, y_train, y_test = train_test_split(x_values, y_values, test_siz
 
 ```python
 logReg = LogisticRegression(solver='liblinear')
-logReg.fit(x_train, y_train)
 
-predictions = logReg.predict(x_test)
-print(predictions)
-print(y_test)
-score = logReg.score(x_test, y_test)
-print(score)
+pred = logReg.fit(x_train, y_train).predict(x_test)
+
+cm = confusion_matrix(y_test, pred)
+
+#print(tn, fp, fn, tp) 
+
+# Show confusion matrix in a separate window
+plt.matshow(cm)
+plt.title('Confusion matrix')
+plt.colorbar()
+plt.ylabel('True label')
+plt.xlabel('Predicted label')
+plt.show()
+
+tn, fp, fn, tp = cm.ravel()
 
 
+# (TP+TN)/(TP+FP+TN+FN)
+print('Accuracy: ' + str(round((float)(tp+tn)/(tp+fp+tn+fn), 4)*100) + '%')
+# TP/(TP+FP)
+print('Sensitivity: ' + str(round((float)(tp)/(tp+fp), 4)*100) + '%')
+# TN/(TN+FN)
+print('Specificity: ' + str(round((float)(tn)/(tn+fn), 4)*100) + '%')
 
 ```
 
-    [1 1 1 1 1 1 1 1 1 1 1 0 1 0 1 0 1 0 0 0 1 0 1 1 0 1 1 0 1 0 1 0 1 0 1 1 1
-     0 1 0 0 1 0 1 1 0 1 1 1 0 0 0 0 1 1 1 1 1 1 0 0 0 1 1 0 1 0 0 0 1 1 0 1 1
-     0 1 1 1 1 1 0 0 0 1 0 1 1 1 0 0 1 0 0 0 1 1 0 1 1 1 1 1 1 0 0 1 0 1 1 0 1
-     0 0 1 1 1 1 1 1 1 1 1 0 1 0 1 1 1 1 1 0 1 1 1 1 1 0 1 0 1 1 1 0]
-    [0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 0 0 0 0 0 1 1 0 1 1 0 1 0 1 0 1 0 1 0 1
-     0 1 0 0 1 0 1 1 0 1 1 1 0 0 0 0 1 1 1 1 1 1 0 0 0 1 1 0 1 0 0 0 1 1 0 1 0
-     0 1 1 1 1 1 0 0 0 1 0 1 1 1 0 0 1 0 1 0 1 1 0 1 1 1 1 1 1 1 0 1 0 1 0 0 1
-     0 0 1 1 1 1 1 1 1 1 1 0 1 0 1 1 1 1 1 0 1 1 1 1 1 1 0 0 1 1 1 0]
-    0.9230769230769231
+
+![png](output_15_0.png)
+
+
+    Accuracy: 92.31%
+    Sensitivity: 93.41%
+    Specificity: 90.38%
 
 
 ### SVM
@@ -206,14 +225,40 @@ print(score)
 
 ```python
 svc = svm.SVC(gamma='scale')
-svc.fit(x_train, y_train)
+pred = svc.fit(x_train, y_train).predict(x_test)
 
-#svc.predict(x_test)
-svc_score = svc.score(x_test, y_test)
-print(svc_score)
+cm = confusion_matrix(y_test, pred)
+
+#print(tn, fp, fn, tp) 
+
+# Show confusion matrix in a separate window
+plt.matshow(cm)
+plt.title('Confusion matrix')
+plt.colorbar()
+plt.ylabel('True label')
+plt.xlabel('Predicted label')
+plt.show()
+
+tn, fp, fn, tp = cm.ravel()
+
+
+# (TP+TN)/(TP+FP+TN+FN)
+print('Accuracy: ' + str(round((float)(tp+tn)/(tp+fp+tn+fn), 4)*100) + '%')
+# TP/(TP+FP)
+print('Sensitivity: ' + str(round((float)(tp)/(tp+fp), 4)*100) + '%')
+# TN/(TN+FN)
+print('Specificity: ' + str(round((float)(tn)/(tn+fn), 4)*100) + '%')
+
+
 ```
 
-    0.8811188811188811
+
+![png](output_17_0.png)
+
+
+    Accuracy: 88.11%
+    Sensitivity: 85.44%
+    Specificity: 95.0%
 
 
 ### Naive Bayesian
@@ -221,18 +266,37 @@ print(svc_score)
 
 ```python
 nb = GaussianNB()
-nb.fit(x_train, y_train)
-nb_score = nb.score(x_test, y_test)
-print(nb_score)
+pred = nb.fit(x_train, y_train).predict(x_test)
+
+cm = confusion_matrix(y_test, pred)
+
+#print(tn, fp, fn, tp) 
+
+# Show confusion matrix in a separate window
+plt.matshow(cm)
+plt.title('Confusion matrix')
+plt.colorbar()
+plt.ylabel('True label')
+plt.xlabel('Predicted label')
+plt.show()
+
+tn, fp, fn, tp = cm.ravel()
+
+
+# (TP+TN)/(TP+FP+TN+FN)
+print('Accuracy: ' + str(round((float)(tp+tn)/(tp+fp+tn+fn), 4)*100) + '%')
+# TP/(TP+FP)
+print('Sensitivity: ' + str(round((float)(tp)/(tp+fp), 4)*100) + '%')
+# TN/(TN+FN)
+print('Specificity: ' + str(round((float)(tn)/(tn+fn), 4)*100) + '%')
+
 ```
 
-    0.9300699300699301
+
+![png](output_19_0.png)
 
 
-## Results
-BLAH BLAH
+    Accuracy: 93.01%
+    Sensitivity: 92.55%
+    Specificity: 93.88%
 
-
-## Conclusions
-
-## References

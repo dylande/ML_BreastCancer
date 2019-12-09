@@ -1,6 +1,0 @@
-Initially there were 54300, entries before any data cleaning.
-
-First, remove unwanted columns.
-
-Then, first round of cleaning will be removing empty/NaN genres.
-  -> This results in ____ Entries.
